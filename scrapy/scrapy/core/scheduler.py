@@ -41,7 +41,7 @@ class Scheduler:
                  logunser=False, stats=None, pqclass=None, crawler=None):
 
         self.df = dupefilter  # url 去重器
-        self.dqdir = self._dqdir(jobdir)  # 磁盘队列的工作目录
+        self.dqdir = self._dqdir(jobdir)  # 磁盘队列的工作目录,
         self.pqclass = pqclass  # 优先队列类名
         self.dqclass = dqclass  # 磁盘队列类名
         self.mqclass = mqclass  # 内存队列类名
@@ -94,10 +94,12 @@ class Scheduler:
         """
 
         self.spider = spider
-        # 优先内存队列实例
+        # 内存队列实例
         self.mqs = self._mq()
-        # 优先磁盘队列实例，如果在启动时候设置了JOBDIR，则激活磁盘队列实例，否则设置None
+        # 磁盘队列实例，如果在启动时候设置了JOBDIR，则激活磁盘队列实例，否则设置None,
+        # 只靠mqs内存优先队列进行队列管理，这也是大多数时候单机版本scrapy的内存管理方式
         self.dqs = self._dq() if self.dqdir else None
+        # 链接去重器
         return self.df.open()
 
     def close(self, reason):
@@ -116,7 +118,8 @@ class Scheduler:
 
     def enqueue_request(self, request):
         """
-        入队列，pqclass优先队列，应该是按照请求的优先级别进行堆操作，而mqclass应该是内存的队列，当队列较多时，将请求数据同步到dqclass磁盘队列。
+        请求入队列，优先选择磁盘优先队列，如果磁盘优先队列为空（没设置JOBDIR），则用内存优先队列，push的时候
+        把请求优先级也压入队列
         Args:
             request: 请求
 
@@ -142,14 +145,17 @@ class Scheduler:
 
     def next_request(self):
         """
-        出队列
-        Returns:
+        出队列，先从内存优先队列里取，如果取不到，则从磁盘优先队列中拿
+        Returns: 请求
 
         """
+        # 从内存优先队列取
         request = self.mqs.pop()
         if request:
+            # 如果没有结果，记录日志
             self.stats.inc_value('scheduler/dequeued/memory', spider=self.spider)
         else:
+            # 否则从磁盘队列取
             request = self._dqpop()
             if request:
                 self.stats.inc_value('scheduler/dequeued/disk', spider=self.spider)
@@ -161,6 +167,14 @@ class Scheduler:
         return len(self.dqs) + len(self.mqs) if self.dqs else len(self.mqs)
 
     def _dqpush(self, request):
+        """
+        磁盘优先队列push
+        Args:
+            request:
+
+        Returns:是否需要磁盘队列去重
+
+        """
         if self.dqs is None:
             return
         try:
@@ -180,6 +194,14 @@ class Scheduler:
             return True
 
     def _mqpush(self, request):
+        """
+        内存优先队列push
+        Args:
+            request:
+
+        Returns:
+
+        """
         self.mqs.push(request)
 
     def _dqpop(self):
@@ -187,7 +209,7 @@ class Scheduler:
             return self.dqs.pop()
 
     def _mq(self):
-        """ Create a new priority queue instance, with in-memory storage """
+        """ 创建内存新优先级队列实例 """
         return create_instance(self.pqclass,
                                settings=None,
                                crawler=self.crawler,
@@ -195,7 +217,7 @@ class Scheduler:
                                key='')
 
     def _dq(self):
-        """ Create a new priority queue instance, with disk storage """
+        """ 使用磁盘存储创建一个新的优先级队列实例 """
         state = self._read_dqs_state(self.dqdir)
         q = create_instance(self.pqclass,
                             settings=None,
