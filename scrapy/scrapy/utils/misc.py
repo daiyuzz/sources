@@ -18,7 +18,6 @@ from scrapy.utils.python import flatten, to_unicode
 from scrapy.item import _BaseItem
 from scrapy.utils.deprecate import ScrapyDeprecationWarning
 
-
 _ITERABLE_SINGLE_VALUES = dict, _BaseItem, str, bytes
 
 
@@ -37,15 +36,16 @@ def arg_to_iter(arg):
 
 
 def load_object(path):
-    """Load an object given its absolute object path, and return it.
-
-    The object can be the import path of a class, function, variable or an
-    instance, e.g. 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware'.
-
-    If ``path`` is not a string, but is a callable object, such as a class or
-    a function, then return it as is.
     """
+    给定对象的绝对对象路径，然后将其返回。该对象可以是类，函数，变量或实例的导入路径，
+    例如“ scrapy.downloadermiddlewares.redirect.RedirectMiddleware”。
+    如果``path''不是字符串，而是可调用对象，例如类或函数，则按原样返回它。
+    Args:
+        path:
 
+    Returns:
+
+    """
     if not isinstance(path, str):
         if callable(path):
             return path
@@ -108,9 +108,9 @@ def extract_regex(regex, text, encoding='utf-8'):
         regex = re.compile(regex, re.UNICODE)
 
     try:
-        strings = [regex.search(text).group('extract')]   # named group
+        strings = [regex.search(text).group('extract')]  # named group
     except Exception:
-        strings = regex.findall(text)    # full regex or numbered groups
+        strings = regex.findall(text)  # full regex or numbered groups
     strings = flatten(strings)
 
     if isinstance(text, str):

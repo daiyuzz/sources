@@ -13,7 +13,6 @@ from warnings import warn
 from scrapy.utils.deprecate import ScrapyDeprecationWarning
 from scrapy.utils.trackref import object_ref
 
-
 class _BaseItem(object_ref):
     """
     Temporary class used internally to avoid the deprecation
