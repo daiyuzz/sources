@@ -184,6 +184,7 @@ class CrawlerRunner:
 
         :param kwargs: keyword arguments to initialize the spider
         """
+        # crawler_or_spiders:爬虫类或spider的name
         if isinstance(crawler_or_spidercls, Spider):
             raise ValueError(
                 'The crawler_or_spidercls argument cannot be a spider object, '
@@ -214,6 +215,11 @@ class CrawlerRunner:
         * If ``crawler_or_spidercls`` is a string, this function finds
           a spider with this name in a Scrapy project (using spider loader),
           then creates a Crawler instance for it.
+        """
+        """
+        如果 ‘‘crawler_or_spidercls’’ 是一个Crawler，原样返回
+        如果`crawler_or_spidercls` 是一个Spider子类，则会为其构造一个新的crawler
+        如果`crawler_or_spidercls`是一字符串，在项目中找到具有改名字的spider，然后创建一个Crawler实例
         """
         if isinstance(crawler_or_spidercls, Spider):
             raise ValueError(
