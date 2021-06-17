@@ -451,14 +451,14 @@ class Settings(BaseSettings):
 
 
 def iter_default_settings():
-    """Return the default settings as an iterator of (name, value) tuples"""
+    """返回settings中的内容，以（name,value）的形式,getattr 获取对象属性值"""
     for name in dir(default_settings):
         if name.isupper():
             yield name, getattr(default_settings, name)
 
 
 def overridden_settings(settings):
-    """Return a dict of the settings that have been overridden"""
+    """返回settings中被覆盖的内容"""
     for name, defvalue in iter_default_settings():
         value = settings[name]
         if not isinstance(defvalue, dict) and value != defvalue:

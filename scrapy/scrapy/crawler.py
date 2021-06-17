@@ -58,7 +58,7 @@ class Crawler:
         d = dict(overridden_settings(self.settings))
         logger.info("Overridden settings:\n%(settings)s",
                     {'settings': pprint.pformat(d)})
-
+        # todo this
         if get_scrapy_root_handler() is not None:
             # scrapy root handler already installed: update it with new settings
             install_scrapy_root_handler(self.settings)
