@@ -146,6 +146,7 @@ fake_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.74 Safari/537.36 Edg/79.0.309.43',  # noqa
 }
 
+# sys.stdout.isatty() 检测文件是否连接到一个终端设备，是返回True，否返回False
 if sys.stdout.isatty():
     default_encoding = sys.stdout.encoding.lower()
 else:
@@ -153,7 +154,7 @@ else:
 
 
 def rc4(key, data):
-    # all encryption algo should work on bytes
+    # 所有加密算法都应该以字节方式进行
     assert type(key) == type(data) and type(key) == type(b'')
     state = list(range(256))
     j = 0
@@ -178,6 +179,7 @@ def rc4(key, data):
 
 
 def general_m3u8_extractor(url, headers={}):
+    """m3u8解析"""
     m3u8_list = get_content(url, headers=headers).split('\n')
     urls = []
     for line in m3u8_list:
@@ -323,8 +325,7 @@ def escape_file_path(path):
 
 
 def ungzip(data):
-    """Decompresses data for Content-Encoding: gzip.
-    """
+    """为内容编码解压缩数据：gzip。"""
     from io import BytesIO
     import gzip
     buffer = BytesIO(data)
@@ -333,7 +334,7 @@ def ungzip(data):
 
 
 def undeflate(data):
-    """Decompresses data for Content-Encoding: deflate.
+    """为内容编码解压缩数据：deflate.
     (the zlib compression is used.)
     """
     import zlib
@@ -419,7 +420,7 @@ def urlopen_with_retry(*args, **kwargs):
 
 
 def get_content(url, headers={}, decoded=True):
-    """Gets the content of a URL via sending a HTTP GET request.
+    """发送HTTP GET 获取请求.
 
     Args:
         url: A URL.
@@ -433,6 +434,7 @@ def get_content(url, headers={}, decoded=True):
     logging.debug('get_content: %s' % url)
 
     req = request.Request(url, headers=headers)
+    # todo cookie添加
     if cookies:
         cookies.add_cookie_header(req)
         req.headers.update(req.unredirected_hdrs)
