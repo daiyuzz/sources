@@ -111,8 +111,7 @@ class Crawler:
 
 class CrawlerRunner:
     """
-    This is a convenient helper class that keeps track of, manages and runs
-    crawlers inside an already setup :mod:`~twisted.internet.reactor`.
+    这是一个方便的辅助类，它跟踪、管理和运行一个已经设置好的 :mod:`~twisted.internet.reactor` 中的爬虫。
 
     The CrawlerRunner object must be instantiated with a
     :class:`~scrapy.settings.Settings` object.
@@ -130,7 +129,7 @@ class CrawlerRunner:
 
     @staticmethod
     def _get_spider_loader(settings):
-        """ Get SpiderLoader instance from settings """
+        """ Get SpiderLoader instance from settings"""
         cls_path = settings.get('SPIDER_LOADER_CLASS')
         loader_cls = load_object(cls_path)
         excs = (DoesNotImplement, MultipleInvalid) if MultipleInvalid else DoesNotImplement
